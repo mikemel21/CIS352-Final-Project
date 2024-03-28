@@ -15,8 +15,6 @@ from sklearn.metrics import accuracy_score
 st.title("CIS 335 Project")
 
 # import dataset
-#df = pd.read_excel("CreditWorthiness.xlsx")
-# df = pd.read_csv("Titanic-DatasetSmall.csv")
 df = pd.read_csv("stroke-dataset.csv")
 
 # remove ID column
@@ -25,4 +23,26 @@ df = df.drop(['id'], axis=1)
 # Replace all N/A values in BMI column with the mean of that column
 df['bmi'] = df['bmi'].fillna(df['bmi'].mean()).round(1)
 
+classifier_name = st.sidebar.selectbox(label="Select classification", options = ["Random Forest", "AdaBoost", "SVM", "Decision Tree"])
+
+def add_parameter_ui (classifier_name):
+    pass
+
+def get_classifier (classifier_name, parameters):
+    match classifier_name:
+        case "Random Forest":
+            pass
+        case "AdaBoost":
+            pass
+        case "SVM":
+            pass
+        case "Desicion Tree":
+            pass
+
+    
 st.write(df)
+
+
+params = add_parameter_ui (classifier_name)
+classifier = get_classifier (classifier_name, params)
+
