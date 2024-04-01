@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import inspect
 import numpy as np
 
 from sklearn.ensemble import RandomForestClassifier
@@ -26,10 +27,6 @@ df = df.drop(['id'], axis=1)
 df['bmi'] = df['bmi'].fillna(df['bmi'].mean()).round(1)
 
 
-classifier_name = st.sidebar.selectbox(label="Select classification", options=["Random Forest", "AdaBoost", "SVM", "Decision Tree"])
-
-normalization_name = st.sidebar.selectbox(label="Select Normalization", options=["None", "MinMax", "Z-Score", "Power Transform"])
-
 # some data pre processing
 df['gender'] = df['gender'].apply(lambda x: x.lower() if isinstance(x, str) else x)
 df['ever_married'] = df['ever_married'].apply(lambda x: x.lower() if isinstance(x, str) else x)
@@ -49,7 +46,7 @@ def add_parameter_ui(classifier_name):
     pass
 
 
-def get_classifier(classifier_name, parameters):
+def get_classifier(classifier_name):
     match classifier_name:
         case "Random Forest":
             return RandomForestClassifier()
@@ -63,32 +60,92 @@ def get_classifier(classifier_name, parameters):
 
 def get_normalizer(normalization_name):
     match normalization_name:
-        case "Min Max":
+        case "MinMax":
             return MinMaxScaler()
         case "Z-Score":
             return StandardScaler()
         case "Power Transform":
             return PowerTransformer()
         case "None":
-            return "No Normalizer Selected"
+            return None
+
 
 st.write(df)
 
-params = add_parameter_ui(classifier_name)
-classifier = get_classifier(classifier_name, params)
-scaler = get_normalizer(normalization_name)
+rd = RandomForestClassifier()
 
-st.write("Set Classifier Parameters")
-st.write(classifier)
+docString = rd.__doc__
 
-# for parms in classifier.get_params():
-#     st.multiselect(label=parms, options=['asdf', 'asfdsa','asdfs'])
+docString = docString.split(sep='\n')
 
-st.write(classifier._get_param_names())
-st.write("\n\n")
-st.write(scaler)
+for idx, line in enumerate(docString):
+    if "Parameter" in line:
+        parameterLine = idx
+        st.write(line)
 
-pipe = Pipeline([
-    ('scaler', scaler),
-    ('classifier', classifier)
-])
+    if "Attribute" in line:
+        attributeLine = idx
+        st.write(line)
+
+paramSection = docString[parameterLine-1:attributeLine]
+
+st.write(paramSection)
+
+with st.expander("**Select Classifier**"):
+    classifier_name = st.selectbox(label="**Classifier options**",
+                                           options=["Random Forest", "AdaBoost", "SVM", "Decision Tree"])
+
+    classifier = get_classifier(classifier_name)
+
+    st.write("Set Classifier Parameters")
+
+    classifierParamNames = classifier.get_params()
+
+    st.write()
+
+    # this gets the parameters and default values for each one
+    classifierParValues = []
+    for par, defVal in classifier.get_params().items():
+        tempVal = st.text_input(label=f"**{par}**", placeholder=defVal)
+
+        # TODO: add description of parameter from docstring here in st.write()
+
+        # if nothing has been put in this field use default
+        if tempVal == "":
+            classifierParValues.append(defVal)
+
+        else:
+            classifierParValues.append(tempVal)
+
+
+with st.expander("Select Normalization Technique"):
+    normalization_name = st.selectbox(label="Normalization Options",
+                                              options=["None", "MinMax", "Z-Score", "Power Transform"])
+
+    normalizer = get_normalizer(normalization_name)
+
+    if normalizer is not None:
+        st.write("Set Normalization Parameters")
+
+        # this gets the parameters and default values for each one
+        normalizerParValues = []
+        for par, defVal in normalizer.get_params().items():
+            tempVal = st.text_input(label=par, placeholder=defVal)
+
+            # TODO: add description of parameter from docstring here in st.write()
+
+            # if nothing has been put in this field use default
+            if tempVal == "":
+                normalizerParValues.append(defVal)
+
+            else:
+                normalizerParValues.append(tempVal)
+
+    else:
+        st.write("No normalization selected")
+
+
+# pipe = Pipeline([
+#     ('scaler', scaler),
+#     ('classifier', classifier)])
+
