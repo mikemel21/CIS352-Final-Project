@@ -72,24 +72,24 @@ def get_normalizer(normalization_name):
 
 st.write(df)
 
-rd = RandomForestClassifier()
-
-docString = rd.__doc__
-
-docString = docString.split(sep='\n')
-
-for idx, line in enumerate(docString):
-    if "Parameter" in line:
-        parameterLine = idx
-        st.write(line)
-
-    if "Attribute" in line:
-        attributeLine = idx
-        st.write(line)
-
-paramSection = docString[parameterLine-1:attributeLine]
-
-st.write(paramSection)
+# rd = RandomForestClassifier()
+# 
+# docString = rd.__doc__
+# 
+# docString = docString.split(sep='\n')
+# 
+# for idx, line in enumerate(docString):
+#     if "Parameter" in line:
+#         parameterLine = idx
+#         st.write(line)
+# 
+#     if "Attribute" in line:
+#         attributeLine = idx
+#         st.write(line)
+# 
+# paramSection = docString[parameterLine-1:attributeLine]
+# 
+# st.write(paramSection)
 
 with st.expander("**Select Classifier**"):
     classifier_name = st.selectbox(label="**Classifier options**",
@@ -98,10 +98,6 @@ with st.expander("**Select Classifier**"):
     classifier = get_classifier(classifier_name)
 
     st.write("Set Classifier Parameters")
-
-    classifierParamNames = classifier.get_params()
-
-    st.write()
 
     # this gets the parameters and default values for each one
     classifierParValues = []
