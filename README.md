@@ -9,7 +9,3 @@ Build a streamlist data mining web application from scratch
 5. (10) Submit the following:
     - A zip file containing every source code materials
     - A text file that contains a google drive PUBLIC link to a recorded demo of your web application. Double check if the link is public and can be accessed. If not, there will be penalties.
-
-# Dataset Ideas
-- Titanic Dataset (https://www.kaggle.com/c/titanic/data?select=train.csv)
-- Credit Worthiness (https://www.kaggle.com/datasets/bbjadeja/predicting-creditworthiness?select=CreditWorthiness.xlsx)
