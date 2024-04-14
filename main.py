@@ -1,20 +1,17 @@
 import streamlit as st
 import pandas as pd
-import inspect
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import PowerTransformer
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, PowerTransformer
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-from sklearn.pipeline import Pipeline  # For setting up pipeline
+from imblearn.over_sampling import SMOTE
+from sklearn.metrics import precision_score, recall_score, f1_score
+from sklearn.pipeline import Pipeline, FeatureUnion  # For setting up pipeline
 
 # title
 st.title("CIS 335 Project: Stroke Dataset")
@@ -213,15 +210,19 @@ y = df.iloc[:, 10]
 X_train, X_test, y_train, y_test = train_test_split(
     x, y, test_size=0.2, random_state=params.get("random-state")
 )
+
 pipe = Pipeline([("scaler", normalizer), ("classifier", classifier)])
 
 pipe.fit(X_train, y_train)
 y_pred = pipe.predict(X_test)
-acc = accuracy_score(y_test, y_pred)
-score = pipe.score(X_test, y_test)
+acc = pipe.score(X_test, y_test)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
 
 st.write(f"Classifier = {classifier_name}")
-st.write("Score = ", score)
+st.write("Accuracy = ", acc)
+st.write("Precision = ", precision)
+st.write("Recall = ", recall)
 
 # age distribution visualization
 palette = {"No Stroke": "blue", "Stroke": "red"}
