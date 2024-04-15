@@ -128,54 +128,16 @@ def get_normalizer(normalization_name):
         case "None":
             return None
 
-
-# st.write(df)
-
-# rd = RandomForestClassifier()
-#
-# docString = rd.__doc__
-#
-# docString = docString.split(sep='\n')
-#
-# for idx, line in enumerate(docString):
-#     if "Parameter" in line:
-#         parameterLine = idx
-#         st.write(line)
-#
-#     if "Attribute" in line:
-#         attributeLine = idx
-#         st.write(line)
-#
-# paramSection = docString[parameterLine-1:attributeLine]
-#
-# st.write(paramSection)
-
 with st.expander("**Select Classifier**"):
     classifier_name = st.selectbox(
         label="**Classifier options**",
         options=["Random Forest", "AdaBoost", "SVM", "Decision Tree"],
     )
 
-    # classifier = get_classifier(classifier_name)
-
     st.write("Set Classifier Parameters")
 
     params = add_parameter_ui(classifier_name)
     classifier = get_classifier(classifier_name, params)
-
-    # this gets the parameters and default values for each one
-    # classifierParValues = []
-    # for par, defVal in classifier.get_params().items():
-    #     tempVal = st.text_input(label=f"**{par}**", placeholder=defVal)
-
-    #     # TODO: add description of parameter from docstring here in st.write()
-
-    #     # if nothing has been put in this field use default
-    #     if tempVal == "":
-    #         classifierParValues.append(defVal)
-
-    #     else:
-    #         classifierParValues.append(tempVal)
 
 
 with st.expander("Select Normalization Technique"):
@@ -229,23 +191,70 @@ st.write("F1 = ", f1)
 st.write("Accuracy = ", acc)
 st.header("Visualizations")
 st.caption("Visualizations of each feature")
-# age distribution visualization
-palette = {"No Stroke": "blue", "Stroke": "red"}
-fig, ax = plt.subplots(figsize=(10, 6))
-sns.histplot(
-    data=df,
-    x="age",
-    hue=df["stroke"].replace({0: "No Stroke", 1: "Stroke"}),
-    palette=palette,
-    binwidth=5,
-    kde=False,
-    multiple="dodge",
-    ax=ax,
-)
-ax.set_title("Age Distribution By Stroke")
-age_bins = np.linspace(df["age"].min(), df["age"].max(), 30)
-ax.set_xticks(age_bins)
-ax.set_xticklabels([int(x) for x in age_bins])
-ax.set_xlabel("Age")
-ax.set_ylabel("Count")
-st.pyplot(fig)
+
+# Visualization of features
+feature_options = df.columns.tolist()
+selected_feature = st.selectbox("Select a feature:", feature_options)
+
+# Create the bar plot visualization
+fig, ax = plt.subplots(figsize=(8, 6))
+if selected_feature in ['hypertension', 'ever_married', 'heart_disease']:
+    value_counts = df[selected_feature].value_counts()
+    ax.bar(value_counts.index, value_counts.values)
+    ax.set_xticks(range(len(value_counts.index)))
+    ax.set_xticklabels(["No", "Yes"])
+    ax.set_xlabel(selected_feature)
+    ax.set_ylabel("Frequency")
+    ax.set_title(f"Bar Plot of {selected_feature}")
+    st.pyplot(fig)
+elif selected_feature == 'Residence_type':
+    value_counts = df[selected_feature].value_counts()
+    ax.bar(value_counts.index, value_counts.values)
+    ax.set_xticks(range(len(value_counts.index)))
+    ax.set_xticklabels(["Urban", "Rural"])
+    ax.set_xlabel(selected_feature)
+    ax.set_ylabel("Frequency")
+    ax.set_title(f"Bar Plot of {selected_feature}")
+    st.pyplot(fig)
+elif selected_feature == 'smoking_status':
+    value_counts = df[selected_feature].value_counts()
+    ax.bar(value_counts.index, value_counts.values)
+    ax.set_xticks(range(len(value_counts.index)))
+    ax.set_xticklabels(["unknown", "never smoked", "formerly smoked", "smokes"])
+    ax.set_xlabel(selected_feature)
+    ax.set_ylabel("Frequency")
+    ax.set_title(f"Bar Plot of {selected_feature}")
+    st.pyplot(fig)
+elif selected_feature == 'gender':
+    value_counts = df[selected_feature].value_counts()
+    ax.bar(value_counts.index, value_counts.values)
+    ax.set_xticks(range(len(value_counts.index)))
+    ax.set_xticklabels(['Male', 'Female', 'Other'])
+    ax.set_xlabel(selected_feature)
+    ax.set_ylabel("Frequency")
+    ax.set_title(f"Bar Plot of {selected_feature}")
+    st.pyplot(fig)
+elif selected_feature == 'work_type':
+    value_counts = df[selected_feature].value_counts()
+    ax.bar(value_counts.index, value_counts.values)
+    ax.set_xticks(range(len(value_counts.index)))
+    ax.set_xticklabels(["children", "never_work", "private", "self-employed", "govt_job"])
+    ax.set_xlabel(selected_feature)
+    ax.set_ylabel("Frequency")
+    ax.set_title(f"Bar Plot of {selected_feature}")
+    st.pyplot(fig)
+elif selected_feature == 'stroke':
+    value_counts = df[selected_feature].value_counts()
+    ax.bar(value_counts.index, value_counts.values)
+    ax.set_xticks(range(len(value_counts.index)))
+    ax.set_xticklabels(["Stroke", "No Stroke"])
+    ax.set_xlabel(selected_feature)
+    ax.set_ylabel("Frequency")
+    ax.set_title(f"Bar Plot of {selected_feature}")
+    st.pyplot(fig)
+else:
+    ax.hist(df[selected_feature], bins=20)
+    ax.set_xlabel(selected_feature)
+    ax.set_ylabel("Frequency")
+    ax.set_title(f"Histogram of {selected_feature}")
+    st.pyplot(fig)
