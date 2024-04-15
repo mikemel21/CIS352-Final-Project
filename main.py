@@ -11,7 +11,7 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler, PowerTransformer
 from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import SMOTE
 from sklearn.metrics import precision_score, recall_score, f1_score
-from sklearn.pipeline import Pipeline, FeatureUnion  # For setting up pipeline
+from sklearn.pipeline import Pipeline # For setting up pipeline
 
 # title
 st.title("CIS 335 Project: Stroke Dataset")
@@ -207,6 +207,8 @@ with st.expander("Select Normalization Technique"):
 x = df.iloc[:, :9]
 y = df.iloc[:, 10]
 
+smt = SMOTE(random_state=params.get("random-state"))
+x, y = smt.fit_resample(x, y)
 X_train, X_test, y_train, y_test = train_test_split(
     x, y, test_size=0.2, random_state=params.get("random-state")
 )
@@ -218,12 +220,15 @@ y_pred = pipe.predict(X_test)
 acc = pipe.score(X_test, y_test)
 precision = precision_score(y_test, y_pred)
 recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
 
 st.write(f"Classifier = {classifier_name}")
-st.write("Accuracy = ", acc)
-st.write("Precision = ", precision)
 st.write("Recall = ", recall)
-
+st.write("Precision = ", precision)
+st.write("F1 = ", f1)
+st.write("Accuracy = ", acc)
+st.header("Visualizations")
+st.caption("Visualizations of each feature")
 # age distribution visualization
 palette = {"No Stroke": "blue", "Stroke": "red"}
 fig, ax = plt.subplots(figsize=(10, 6))
